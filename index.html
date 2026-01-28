@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZetaChain Pro | Login</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@web3modal/ethers@5.1.11/dist/index.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+
+        body {
+            background-color: #050505;
+            color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .gold-bg {
+            background: linear-gradient(135deg, #f3ba2f 0%, #ffdb4d 100%);
+            color: black;
+        }
+
+        .shadow-glow {
+            shadow-[0_0_50px_rgba(243,186,47,0.3)];
+        }
+    </style>
+</head>
+
+<body class="flex flex-col items-center justify-center min-h-screen p-6">
+
+    <div class="w-full max-w-sm text-center">
+        <div class="mb-10">
+            <div class="w-20 h-20 gold-bg rounded-[2rem] flex items-center justify-center text-4xl mx-auto mb-6 shadow-[0_0_50px_rgba(243,186,47,0.3)]">
+                <i class="fa-solid fa-bolt-lightning"></i>
+            </div>
+            <h1 class="text-3xl font-black italic uppercase tracking-tighter">
+                ZetaChain <span class="text-[#f3ba2f] text-xl">PRO</span>
+            </h1>
+            <p class="text-[10px] text-gray-500 font-bold uppercase mt-2 tracking-widest">
+                Web3 Terminal Access
+            </p>
+        </div>
+
+        <div class="space-y-4">
+            <button onclick="handleConnect()" 
+                    class="w-full py-4 gold-bg rounded-2xl font-black italic uppercase text-sm shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-transform">
+                <i class="fa-solid fa-wallet text-lg"></i>
+                <span id="status-text">Hubungkan Wallet</span>
+            </button>
+            
+            <p class="text-[9px] text-gray-600 uppercase font-bold tracking-tighter">
+                Mendukung MetaMask, Trust Wallet & Phantom
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // 1. Inisialisasi WalletConnect (Reown)
+        const projectId = 'Cec254c96efb6947d34d6979423c88ce';
+
+        const mainnet = {
+            chainId: 7000,
+            name: 'ZetaChain',
+            currency: 'ZETA',
+            explorerUrl: 'https://explorer.zetachain.com',
+            rpcUrl: 'https://zetachain-mainnet-archive.allthatnode.com:8545'
+        };
+
+        const modal = Web3ModalEthers.createWeb3Modal({
+            ethersConfig: Web3ModalEthers.defaultConfig({
+                metadata: {
+                    name: 'ZetaChain Pro',
+                    description: 'Web3 Trading Terminal',
+                    url: window.location.origin,
+                    icons: ['https://avatars.githubusercontent.com/u/37784886']
+                }
+            }),
+            chains: [mainnet],
+            projectId
+        });
+
+        // 2. Fungsi Connect Wallet
+        async function handleConnect() {
+            const statusText = document.getElementById('status-text');
+            try {
+                await modal.open();
+                
+                // Interval pengecekan status koneksi
+                const check = setInterval(() => {
+                    if (modal.getIsConnected()) {
+                        clearInterval(check);
+                        const address = modal.getAddress();
+                        
+                        // Simpan alamat ke session browser
+                        localStorage.setItem('userWallet', address);
+                        
+                        // Redirect ke Dashboard
+                        window.location.href = "dashboard.html";
+                    }
+                }, 1000);
+            } catch (e) {
+                console.error(e);
+                alert("Koneksi gagal atau dibatalkan");
+            }
+        }
+
+        // 3. Auto-Login Check
+        window.onload = () => {
+            if (localStorage.getItem('userWallet')) {
+                window.location.href = "dashboard.html";
+            }
+        };
+    </script>
+</body>
+</html>
