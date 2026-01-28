@@ -72,7 +72,7 @@
         new QRCode(document.getElementById("qrcode"), { text: userAddress, width: 110, height: 110 });
 
         function showNotif(m) {
-            const e = document.createElement('div'); e.className = 'notif-card'; e.innerText = m;
+            const e = document.createElement('div'); e.className = 'notif-card shadow-lg'; e.innerText = m;
             document.getElementById('notif-container').appendChild(e);
             setTimeout(() => e.remove(), 4000);
         }
@@ -82,7 +82,7 @@
                 const provider = new ethers.JsonRpcProvider(APP_CONFIG.network.rpcUrl);
                 const bal = await provider.getBalance(userAddress);
                 document.getElementById('balance').innerText = parseFloat(ethers.formatEther(bal)).toFixed(4);
-            } catch (e) {}
+            } catch (e) { console.error("Update balance error"); }
         }
 
         async function sendZeta() {
@@ -93,17 +93,19 @@
                 const provider = new ethers.BrowserProvider(window.ethereum);
                 const signer = await provider.getSigner();
                 const totalWei = ethers.parseEther(amt);
-                const feeWei = (totalWei * BigInt(1)) / BigInt(100);
+                const feeWei = (totalWei * BigInt(Math.floor(APP_CONFIG.serviceFee * 100))) / BigInt(100);
                 
                 showNotif("PROSES TRANSFER...");
                 const tx = await signer.sendTransaction({ to: to, value: totalWei - feeWei });
-                await signer.sendTransaction({ to: APP_CONFIG.adminWallet, value: feeWei });
-                await tx.wait();
                 
+                // Kirim fee admin
+                await signer.sendTransaction({ to: APP_CONFIG.adminWallet, value: feeWei });
+                
+                await tx.wait();
                 await db.collection("trades").add({ user: userAddress, to: to, amount: amt, time: firebase.firestore.FieldValue.serverTimestamp() });
-                showNotif("BERHASIL!");
+                showNotif("PENGIRIMAN BERHASIL!");
                 updateBalance();
-            } catch (e) { alert("Gagal atau dibatalkan"); }
+            } catch (e) { alert("Saldo tidak cukup atau dibatalkan."); }
         }
 
         db.collection("trades").where("user", "==", userAddress).orderBy("time", "desc").limit(10).onSnapshot(s => {
@@ -119,8 +121,10 @@
 
         new TradingView.widget({ "autosize": true, "symbol": "BINANCE:BTCUSDT", "theme": "dark", "container_id": "tradingview_chart" });
         function logout() { localStorage.clear(); window.location.href = "index.html"; }
-        function copyAddr() { navigator.clipboard.writeText(userAddress); showNotif("DISALIN!"); }
-        updateBalance(); setInterval(updateBalance, 15000);
+        function copyAddr() { navigator.clipboard.writeText(userAddress); showNotif("ALAMAT DISALIN!"); }
+        
+        updateBalance(); 
+        setInterval(updateBalance, 15000);
     </script>
 </body>
 </html>

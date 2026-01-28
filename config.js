@@ -1,18 +1,11 @@
 const APP_CONFIG = {
-    // 1. KONEKSI WALLET (Reown / WalletConnect)
     projectId: 'Cec254c96efb6947d34d6979423c88ce', 
-
-    // 2. PENGATURAN ADMIN
     adminWallet: '0x4c51175cdf9b6311ce152694f146d29be8911432', 
-    serviceFee: 0.01, // Fee 1%
-
-    // 3. KONFIGURASI BLOCKCHAIN
+    serviceFee: 0.01, 
     network: {
         chainId: 7000,
         rpcUrl: 'https://zetachain-mainnet-archive.allthatnode.com:8545'
     },
-
-    // 4. KONFIGURASI FIREBASE (Data studio-727777898-40aea)
     firebase: {
         apiKey: "AIzaSyDrpBJTtankyLgimtOwuriFpiyuC5K10OI",
         authDomain: "studio-727777898-40aea.firebaseapp.com",

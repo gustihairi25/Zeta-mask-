@@ -31,9 +31,13 @@
 
     <script>
         let modal;
-        // Inisialisasi saat window dimuat
-        window.onload = () => {
-            if (localStorage.getItem('userWallet')) window.location.href = "dashboard.html";
+
+        // Fungsi inisialisasi otomatis
+        async function init() {
+            if (localStorage.getItem('userWallet')) {
+                window.location.href = "dashboard.html";
+                return;
+            }
             
             try {
                 modal = Web3ModalEthers.createWeb3Modal({
@@ -52,14 +56,23 @@
                     }],
                     projectId: APP_CONFIG.projectId
                 });
-            } catch (e) { console.error("Modal Init Error", e); }
-        };
+            } catch (e) {
+                console.error("Gagal memuat modal:", e);
+            }
+        }
 
         async function handleConnect() {
-            if (!modal) return alert("Sistem belum siap...");
+            const statusText = document.getElementById('status-text');
+            if (!modal) {
+                statusText.innerText = "Mencoba ulang...";
+                await init();
+                if (!modal) return alert("Sistem belum siap. Periksa koneksi internet Anda.");
+            }
+
             try {
-                document.getElementById('status-text').innerText = "Membuka Wallet...";
+                statusText.innerText = "Membuka Wallet...";
                 await modal.open();
+                
                 const check = setInterval(() => {
                     if (modal.getIsConnected()) {
                         clearInterval(check);
@@ -67,8 +80,13 @@
                         window.location.href = "dashboard.html";
                     }
                 }, 1000);
-            } catch (e) { alert("Koneksi gagal"); }
+            } catch (e) {
+                statusText.innerText = "Hubungkan Wallet";
+                alert("Koneksi dibatalkan");
+            }
         }
+
+        init(); // Jalankan inisialisasi saat script dimuat
     </script>
 </body>
 </html>
