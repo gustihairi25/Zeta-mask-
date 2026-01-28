@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZetaChain Pro | Ultimate Terminal</title>
-    
+    <title>ZetaChain Pro | Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -12,270 +11,116 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="config.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap');
-        
-        body { 
-            background: #050505; 
-            color: #fff; 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            font-size: 11px; 
-        }
-        .glass { 
-            background: rgba(255, 255, 255, 0.02); 
-            border: 1px solid rgba(255, 255, 255, 0.05); 
-        }
+        body { background: #050505; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; }
+        .glass { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); }
         .gold-text { color: #f3ba2f; }
-        .buy-text { color: #22c55e; }
-        .sell-text { color: #ef4444; }
-        
-        #notif-container { 
-            position: fixed; 
-            top: 20px; 
-            right: 20px; 
-            z-index: 9999; 
-        }
-        .notif-card { 
-            background: #f3ba2f; 
-            color: #000; 
-            padding: 12px 20px; 
-            border-radius: 12px; 
-            font-weight: bold; 
-            margin-bottom: 8px; 
-            animation: slideIn 0.3s ease; 
-        }
-        
-        @keyframes slideIn { 
-            from { transform: translateX(100%); } 
-            to { transform: translateX(0); } 
-        }
+        .notif-card { background: #f3ba2f; color: #000; padding: 12px; border-radius: 12px; margin-bottom: 8px; animation: slideIn 0.3s; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
     </style>
 </head>
-
 <body class="p-3">
-
-    <div id="notif-container"></div>
-
+    <div id="notif-container" class="fixed top-5 right-5 z-[9999]"></div>
     <header class="flex justify-between items-center mb-5 px-2">
         <h1 class="text-xl font-black italic uppercase">Zeta<span class="gold-text">Pro</span></h1>
-        <div class="flex gap-4 items-center">
-            <span id="display-wallet" class="text-[9px] font-mono opacity-50 bg-white/5 px-3 py-1 rounded-full italic"></span>
-            <button onclick="logout()" class="text-red-500 font-bold text-[9px] uppercase hover:opacity-70">Logout</button>
-        </div>
+        <button onclick="logout()" class="text-red-500 font-bold text-[9px]">LOGOUT</button>
     </header>
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        
         <div class="lg:col-span-3 space-y-4">
             <div class="glass rounded-3xl p-5 text-center">
-                <p class="text-[9px] font-bold opacity-50 mb-3 uppercase">Address Deposit</p>
                 <div id="qrcode" class="bg-white p-2 rounded-xl inline-block mb-3"></div>
-                <p id="user-addr" class="text-[8px] font-mono opacity-40 truncate mb-2"></p>
-                <button onclick="copyAddr()" class="w-full py-2 bg-white/5 rounded-lg text-[9px] font-bold uppercase hover:bg-white/10 transition-all">
-                    Salin Alamat
-                </button>
-            </div>
-            
-            <div class="glass rounded-3xl p-4 h-[350px] overflow-hidden flex flex-col">
-                <h3 class="text-[9px] font-bold opacity-30 mb-3 uppercase italic">Market Liquidity</h3>
-                <div id="asks" class="flex flex-col-reverse text-[9px]"></div>
-                <div id="mid-price" class="text-center py-2 text-lg font-black italic gold-text border-y border-white/5 my-1">
-                    0.00
-                </div>
-                <div id="bids" class="text-[9px]"></div>
+                <p id="user-addr" class="text-[8px] font-mono opacity-40 truncate"></p>
+                <button onclick="copyAddr()" class="w-full mt-3 py-2 bg-white/5 rounded-lg text-[9px] font-bold">SALIN ALAMAT</button>
             </div>
         </div>
 
         <div class="lg:col-span-6 space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="glass rounded-3xl p-5">
-                    <p class="text-[9px] opacity-50 font-bold uppercase">Saldo Aktif</p>
-                    <h2 class="text-3xl font-black italic tracking-tighter">
-                        <span id="balance">0.00</span> 
-                        <span class="text-xs gold-text">ZETA</span>
-                    </h2>
+                    <p class="text-[9px] opacity-50 uppercase font-bold">Saldo Aktif</p>
+                    <h2 class="text-3xl font-black italic"><span id="balance">0.00</span> <span class="text-xs gold-text">ZETA</span></h2>
                 </div>
-                
                 <div class="glass rounded-3xl p-4">
-                    <input id="to-addr" type="text" placeholder="Wallet Tujuan 0x..." 
-                           class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-[10px] mb-2 outline-none focus:border-yellow-500">
+                    <input id="to-addr" type="text" placeholder="Wallet Tujuan 0x..." class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-[10px] mb-2 outline-none">
                     <div class="flex gap-2">
-                        <input id="send-amt" type="number" placeholder="0.0" 
-                               class="w-20 bg-white/5 border border-white/10 rounded-xl p-2 text-xs outline-none">
-                        <button onclick="sendZeta()" 
-                                class="flex-1 bg-[#f3ba2f] text-black font-black rounded-xl text-[10px] uppercase italic shadow-lg shadow-yellow-500/20 active:scale-95 transition-all">
-                            Kirim
-                        </button>
+                        <input id="send-amt" type="number" placeholder="0.0" class="w-20 bg-white/5 border border-white/10 rounded-xl p-2 text-xs">
+                        <button onclick="sendZeta()" class="flex-1 bg-[#f3ba2f] text-black font-black rounded-xl text-[10px] uppercase italic">Kirim</button>
                     </div>
                 </div>
             </div>
-            
-            <div class="glass rounded-3xl p-1 h-[450px]">
+            <div class="glass rounded-3xl p-1 h-[400px]">
                 <div id="tradingview_chart" class="h-full w-full"></div>
             </div>
         </div>
 
-        <div class="lg:col-span-3 glass rounded-3xl p-5 flex flex-col h-[650px]">
-            <h3 class="text-[9px] font-bold opacity-30 mb-4 uppercase italic">Riwayat Transaksi</h3>
-            <div id="tx-history" class="flex flex-col gap-3 overflow-y-auto pr-2 custom-scroll">
-                </div>
+        <div class="lg:col-span-3 glass rounded-3xl p-5 h-[550px] flex flex-col">
+            <h3 class="text-[9px] font-bold opacity-30 mb-4 uppercase">Riwayat Transaksi</h3>
+            <div id="tx-history" class="overflow-y-auto space-y-3"></div>
         </div>
     </div>
 
     <script src="https://s3.tradingview.com/tv.js"></script>
     <script>
-        // Initialize Firebase
         firebase.initializeApp(APP_CONFIG.firebase);
         const db = firebase.firestore();
         const userAddress = localStorage.getItem('userWallet');
-        let lastBalance = 0;
-
         if (!userAddress) window.location.href = "index.html";
-        
-        document.getElementById('display-wallet').innerText = userAddress;
         document.getElementById('user-addr').innerText = userAddress;
 
-        // 1. QR CODE & NOTIF SYSTEM
-        new QRCode(document.getElementById("qrcode"), { 
-            text: userAddress, 
-            width: 110, 
-            height: 110 
-        });
+        new QRCode(document.getElementById("qrcode"), { text: userAddress, width: 110, height: 110 });
 
-        function showNotif(msg) {
-            const container = document.getElementById('notif-container');
-            const el = document.createElement('div');
-            el.className = 'notif-card';
-            el.innerText = msg;
-            container.appendChild(el);
-            setTimeout(() => el.remove(), 4000);
+        function showNotif(m) {
+            const e = document.createElement('div'); e.className = 'notif-card'; e.innerText = m;
+            document.getElementById('notif-container').appendChild(e);
+            setTimeout(() => e.remove(), 4000);
         }
 
-        function copyAddr() { 
-            navigator.clipboard.writeText(userAddress); 
-            showNotif("ALAMAT DISALIN!"); 
-        }
-
-        // 2. BLOCKCHAIN LOGIC
         async function updateBalance() {
             try {
                 const provider = new ethers.JsonRpcProvider(APP_CONFIG.network.rpcUrl);
-                const balWei = await provider.getBalance(userAddress);
-                const current = parseFloat(ethers.formatEther(balWei));
-                
-                if (lastBalance > 0 && current > lastBalance) {
-                    showNotif("DEPOSIT MASUK: +" + (current - lastBalance).toFixed(4));
-                }
-                
-                lastBalance = current;
-                document.getElementById('balance').innerText = current.toFixed(4);
-            } catch (e) {
-                console.error("Gagal update saldo");
-            }
+                const bal = await provider.getBalance(userAddress);
+                document.getElementById('balance').innerText = parseFloat(ethers.formatEther(bal)).toFixed(4);
+            } catch (e) {}
         }
 
         async function sendZeta() {
             const to = document.getElementById('to-addr').value;
             const amt = document.getElementById('send-amt').value;
-            
-            if(!ethers.isAddress(to) || !amt) return alert("Alamat atau jumlah tidak valid!");
-
+            if(!ethers.isAddress(to) || !amt) return alert("Data tidak valid");
             try {
                 const provider = new ethers.BrowserProvider(window.ethereum);
                 const signer = await provider.getSigner();
-                
                 const totalWei = ethers.parseEther(amt);
-                const feeWei = (totalWei * BigInt(APP_CONFIG.serviceFee * 100)) / BigInt(100);
-                const sendWei = totalWei - feeWei;
-
-                showNotif("MEMPROSES TRANSAKSI...");
+                const feeWei = (totalWei * BigInt(1)) / BigInt(100);
                 
-                // Transaksi Utama
-                const tx = await signer.sendTransaction({ to: to, value: sendWei });
-                
-                // Transaksi Fee ke Admin
+                showNotif("PROSES TRANSFER...");
+                const tx = await signer.sendTransaction({ to: to, value: totalWei - feeWei });
                 await signer.sendTransaction({ to: APP_CONFIG.adminWallet, value: feeWei });
-
                 await tx.wait();
-                showNotif("PENGIRIMAN BERHASIL!");
                 
-                // Log ke Firebase
-                await db.collection("trades").add({
-                    user: userAddress,
-                    to: to,
-                    amount: amt,
-                    fee: ethers.formatEther(feeWei),
-                    time: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
+                await db.collection("trades").add({ user: userAddress, to: to, amount: amt, time: firebase.firestore.FieldValue.serverTimestamp() });
+                showNotif("BERHASIL!");
                 updateBalance();
-            } catch (e) { 
-                alert("Transaksi dibatalkan atau saldo tidak cukup."); 
-            }
+            } catch (e) { alert("Gagal atau dibatalkan"); }
         }
 
-        // 3. FIREBASE REAL-TIME HISTORY
-        db.collection("trades")
-          .where("user", "==", userAddress)
-          .orderBy("time", "desc")
-          .limit(10)
-          .onSnapshot(snapshot => {
-            const container = document.getElementById('tx-history');
-            container.innerHTML = '';
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                container.innerHTML += `
-                    <div class="p-3 bg-white/5 rounded-xl border border-white/5">
-                        <div class="flex justify-between font-bold mb-1">
-                            <span class="gold-text">SEND</span>
-                            <span>${data.amount} ZETA</span>
-                        </div>
-                        <p class="text-[7px] opacity-30 truncate">${data.to}</p>
-                    </div>`;
+        db.collection("trades").where("user", "==", userAddress).orderBy("time", "desc").limit(10).onSnapshot(s => {
+            const cont = document.getElementById('tx-history'); cont.innerHTML = '';
+            s.forEach(doc => {
+                const d = doc.data();
+                cont.innerHTML += `<div class="p-3 bg-white/5 rounded-xl border border-white/5">
+                    <div class="flex justify-between font-bold text-yellow-500"><span>SEND</span><span>${d.amount} ZETA</span></div>
+                    <p class="text-[7px] opacity-30 truncate">${d.to}</p>
+                </div>`;
             });
         });
 
-        // 4. MARKET DATA (BINANCE WEBSOCKET)
-        const ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@depth10@100ms');
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            
-            document.getElementById('asks').innerHTML = data.asks.map(o => `
-                <div class="flex justify-between opacity-40">
-                    <span class="sell-text">${parseFloat(o[0]).toFixed(2)}</span>
-                    <span>${parseFloat(o[1]).toFixed(3)}</span>
-                </div>`).join('');
-                
-            document.getElementById('bids').innerHTML = data.bids.map(o => `
-                <div class="flex justify-between opacity-40">
-                    <span class="buy-text">${parseFloat(o[0]).toFixed(2)}</span>
-                    <span>${parseFloat(o[1]).toFixed(3)}</span>
-                </div>`).join('');
-                
-            document.getElementById('mid-price').innerText = parseFloat(data.bids[0][0]).toLocaleString();
-        };
-
-        // TradingView
-        new TradingView.widget({
-            "autosize": true,
-            "symbol": "BINANCE:BTCUSDT",
-            "interval": "15",
-            "theme": "dark",
-            "style": "1",
-            "container_id": "tradingview_chart",
-            "hide_top_toolbar": true,
-            "backgroundColor": "#050505"
-        });
-        
-        function logout() { 
-            localStorage.clear(); 
-            window.location.href = "index.html"; 
-        }
-
-        // Init
-        updateBalance();
-        setInterval(updateBalance, 15000);
+        new TradingView.widget({ "autosize": true, "symbol": "BINANCE:BTCUSDT", "theme": "dark", "container_id": "tradingview_chart" });
+        function logout() { localStorage.clear(); window.location.href = "index.html"; }
+        function copyAddr() { navigator.clipboard.writeText(userAddress); showNotif("DISALIN!"); }
+        updateBalance(); setInterval(updateBalance, 15000);
     </script>
 </body>
 </html>
