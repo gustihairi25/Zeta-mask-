@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZetaChain | Gateway</title>
+    <title>ZetaChain Pro | Gateway</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="config.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -14,51 +14,50 @@
         .gold-text { color: #f3ba2f; }
         .gold-bg { background: #f3ba2f; color: #000; }
         
+        /* Animasi Slide */
         .slide-content { display: flex; width: 200%; transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
         .form-box { width: 50%; padding: 0 20px; }
         .active-register .slide-content { transform: translateX(-50%); }
         
         input { background: #000 !important; border: 1px solid #1a1a1a !important; color: white !important; }
         input:focus { border-color: #f3ba2f !important; outline: none; }
-        .glass { background: rgba(15, 15, 15, 0.8); backdrop-filter: blur(10px); }
     </style>
 </head>
 <body class="p-4">
 
     <div id="auth-wrapper" class="w-full max-w-md">
-        <div class="flex flex-col items-center mb-8">
-            <div class="w-16 h-16 gold-bg rounded-[2rem] flex items-center justify-center text-3xl shadow-2xl shadow-yellow-500/20 mb-4 animate-pulse">
-                <i class="fa-solid fa-shield-halved"></i>
+        <div class="flex flex-col items-center mb-6">
+            <div class="w-14 h-14 gold-bg rounded-2xl flex items-center justify-center text-2xl shadow-2xl mb-3">
+                <i class="fa-solid fa-bolt-lightning"></i>
             </div>
-            <h1 id="main-title" class="text-2xl font-black italic gold-text uppercase tracking-tighter">ZetaChain Pro</h1>
-            <p class="text-[8px] text-gray-500 font-bold tracking-[5px] uppercase mt-2">Decentralized Terminal</p>
+            <h1 id="page-title" class="text-xl font-black italic gold-text uppercase">Masuk Terminal</h1>
         </div>
 
         <div class="px-5 mb-6">
             <button onclick="connectWallet()" id="btn-wallet" class="w-full py-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center gap-3 active:scale-95 transition-all">
-                <img src="https://raw.githubusercontent.com/WalletConnect/walletconnect-assets/master/Logo/Blue%20(Default)/Logo.svg" class="w-5 h-5">
-                <span class="text-[10px] font-black uppercase italic">Connect Crypto Wallet</span>
+                <i class="fa-solid fa-wallet text-blue-400"></i>
+                <span class="text-[10px] font-black uppercase italic">Hubungkan Wallet Crypto</span>
             </button>
         </div>
 
-        <div class="relative overflow-hidden">
+        <div class="overflow-hidden">
             <div class="slide-content">
                 
                 <div class="form-box">
-                    <div class="bg-card p-7 rounded-[2.5rem] border border-white/5 space-y-5">
+                    <div class="bg-card p-7 rounded-[2.5rem] border border-white/5 space-y-4">
                         <input id="l-email" type="email" placeholder="Email Address" class="w-full rounded-2xl p-4 text-xs font-bold">
                         <input id="l-pass" type="password" placeholder="Password" class="w-full rounded-2xl p-4 text-xs font-bold">
                         <button onclick="doLogin()" id="btn-l" class="w-full py-4 gold-bg rounded-2xl font-black uppercase text-[10px] italic">Sign In</button>
-                        <p class="text-center text-[9px] text-gray-500 font-bold uppercase">New user? <button onclick="toggleView(true)" class="gold-text">Create Account</button></p>
+                        <p class="text-center text-[9px] text-gray-500 font-bold uppercase">Baru di sini? <button onclick="toggleView(true)" class="gold-text">Daftar Akun</button></p>
                     </div>
                 </div>
 
                 <div class="form-box">
-                    <div class="bg-card p-7 rounded-[2.5rem] border border-white/5 space-y-5">
-                        <input id="r-email" type="email" placeholder="New Email" class="w-full rounded-2xl p-4 text-xs font-bold">
-                        <input id="r-pass" type="password" placeholder="New Password" class="w-full rounded-2xl p-4 text-xs font-bold">
-                        <button onclick="doRegister()" id="btn-r" class="w-full py-4 bg-white text-black rounded-2xl font-black uppercase text-[10px] italic">Join Now</button>
-                        <p class="text-center text-[9px] text-gray-500 font-bold uppercase">Have account? <button onclick="toggleView(false)" class="gold-text">Sign In</button></p>
+                    <div class="bg-card p-7 rounded-[2.5rem] border border-white/5 space-y-4">
+                        <input id="r-email" type="email" placeholder="Email Baru" class="w-full rounded-2xl p-4 text-xs font-bold">
+                        <input id="r-pass" type="password" placeholder="Password Baru" class="w-full rounded-2xl p-4 text-xs font-bold">
+                        <button onclick="doRegister()" id="btn-r" class="w-full py-4 bg-white text-black rounded-2xl font-black uppercase text-[10px] italic">Daftar Sekarang</button>
+                        <p class="text-center text-[9px] text-gray-500 font-bold uppercase">Sudah punya akun? <button onclick="toggleView(false)" class="gold-text">Sign In</button></p>
                     </div>
                 </div>
 
@@ -75,61 +74,66 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        const wrapper = document.body;
-        
-        // Cek sesi login
+        const wrapper = document.getElementById('auth-wrapper');
+        const title = document.getElementById('page-title');
+
+        // Cek Sesi Login
         onAuthStateChanged(auth, (user) => {
             if (user) window.location.href = "dashboard.html";
         });
 
-        // Toggle Slide
+        // Fungsi Slide
         window.toggleView = (showReg) => {
-            if(showReg) wrapper.classList.add('active-register');
-            else wrapper.classList.remove('active-register');
+            if(showReg) {
+                wrapper.classList.add('active-register');
+                title.innerText = "Daftar Akun";
+            } else {
+                wrapper.classList.remove('active-register');
+                title.innerText = "Masuk Terminal";
+            }
         };
 
         // Login Manual
         window.doLogin = async () => {
             const e = document.getElementById('l-email').value;
             const p = document.getElementById('l-pass').value;
-            if(!e || !p) return alert("Fill all fields");
+            if(!e || !p) return alert("Harap isi semua kolom!");
             try {
                 await signInWithEmailAndPassword(auth, e, p);
-            } catch(err) { alert("Login failed: " + err.message); }
+            } catch(err) { alert("Login gagal! Cek email dan password."); }
         };
 
-        // Register Manual
+        // Daftar Manual
         window.doRegister = async () => {
             const e = document.getElementById('r-email').value;
             const p = document.getElementById('r-pass').value;
-            if(!e || p.length < 6) return alert("Min. 6 chars password");
+            if(!e || p.length < 6) return alert("Password minimal 6 karakter!");
             try {
                 const res = await createUserWithEmailAndPassword(auth, e, p);
+                // Buat data user di Firestore
                 await setDoc(doc(db, "users", res.user.uid), {
                     email: e, balance: 0, kyc_status: "Unverified", timestamp: new Date()
                 });
-            } catch(err) { alert("Register failed"); }
+            } catch(err) { alert("Pendaftaran gagal."); }
         };
 
-        // Wallet Connect Alternative
+        // Wallet Connect Logic (Menghilangkan Pesan "Sistem Belum Siap")
         window.connectWallet = async () => {
             const btn = document.getElementById('btn-wallet');
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Initializing...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menghubungkan...';
             
-            // Simpel Wallet Detection (MetaMask/Trust)
             if (window.ethereum) {
                 try {
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    alert("Wallet Connected: " + accounts[0].substring(0, 6) + "...");
-                    // Opsional: Buat user di Firebase berdasarkan Address
+                    localStorage.setItem('walletAddress', accounts[0]);
                     window.location.href = "dashboard.html";
                 } catch (err) {
-                    btn.innerHTML = 'Try Again';
-                    alert("Connection rejected");
+                    btn.innerHTML = '<i class="fa-solid fa-wallet"></i> Hubungkan Wallet Crypto';
+                    alert("Koneksi dompet ditolak.");
                 }
             } else {
-                alert("No Wallet Detected. Please use Email Login.");
-                btn.innerHTML = 'Use Email Login';
+                btn.innerHTML = '<i class="fa-solid fa-wallet"></i> Hubungkan Wallet Crypto';
+                alert("Dompet Crypto (MetaMask/Trust) tidak terdeteksi. Silakan gunakan email.");
             }
         };
     </script>
